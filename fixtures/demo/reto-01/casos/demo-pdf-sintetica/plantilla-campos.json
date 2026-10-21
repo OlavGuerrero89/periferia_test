@@ -1,0 +1,4 @@
+[
+  { "etiqueta": "Identificación tributaria", "obligatorio": true },
+  { "etiqueta": "Correo de contacto", "obligatorio": true }
+]

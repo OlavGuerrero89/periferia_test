@@ -1,0 +1,11 @@
+{
+  "id": "demo-pdf-sintetica",
+  "de": "compras@example.invalid",
+  "asunto": "Formulario PDF sintético",
+  "fecha": "2026-10-21",
+  "pais": "EC",
+  "cliente": "Cliente Andino Sintético",
+  "cuerpo": "Completar los campos indicados para revisión.",
+  "formato": "pdf",
+  "adjuntos": []
+}

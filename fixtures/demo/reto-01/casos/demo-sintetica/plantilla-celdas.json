@@ -1,0 +1,9 @@
+[
+  { "hoja": "Formulario", "celda_etiqueta": "A1", "etiqueta": "Razón social", "celda_valor": "B1" },
+  { "hoja": "Formulario", "celda_etiqueta": "A2", "etiqueta": "NIT", "celda_valor": "B2" },
+  { "hoja": "Formulario", "celda_etiqueta": "A3", "etiqueta": "Dirección", "celda_valor": "B3" },
+  { "hoja": "Formulario", "celda_etiqueta": "A4", "etiqueta": "Representante legal", "celda_valor": "B4" },
+  { "hoja": "Formulario", "celda_etiqueta": "A5", "etiqueta": "Correo de contacto", "celda_valor": "B5" },
+  { "hoja": "Formulario", "celda_etiqueta": "A6", "etiqueta": "Cuenta bancaria", "celda_valor": "B6" },
+  { "hoja": "Formulario", "celda_etiqueta": "A7", "etiqueta": "Código de certificación inexistente", "celda_valor": "B7" }
+]

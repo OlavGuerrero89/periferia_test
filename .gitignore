@@ -1,8 +1,11 @@
 node_modules/
 .next/
 .env
+.env.*
+!.env.example
 .env.local
 outputs/
+/out/
 coverage/
 *.tsbuildinfo
 fixtures/reto-01/repositorio/

@@ -1,0 +1,8 @@
+{
+  "razon_social": ["razón social", "nombre legal", "nombre de la empresa"],
+  "nit": ["nit", "número de identificación tributaria", "identificación tributaria"],
+  "direccion": ["dirección", "domicilio", "dirección principal"],
+  "representante_legal": ["representante legal", "nombre del representante"],
+  "contacto.email": ["correo de contacto", "correo electrónico"],
+  "banco.cuenta": ["cuenta bancaria", "número de cuenta"]
+}

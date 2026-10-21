@@ -1,0 +1,8 @@
+{
+  "razon_social": "Empresa Sintética de Prueba S.A.S.",
+  "nit": "900000000-1",
+  "direccion": "Calle Falsa 123, Bogotá",
+  "representante_legal": "Persona Sintética",
+  "contacto": { "email": "contacto@example.invalid" },
+  "banco": { "cuenta": "000000000000000000" }
+}

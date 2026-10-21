@@ -1,0 +1,4 @@
+[
+  { "etiqueta": "Razón social", "obligatorio": true },
+  { "etiqueta": "Correo de contacto", "obligatorio": false }
+]
