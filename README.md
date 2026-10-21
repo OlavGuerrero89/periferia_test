@@ -105,7 +105,11 @@ Configura `.env` para Compose y ejecuta. Para usar los fixtures reales, cambia `
 docker compose up --build
 ```
 
-No hay URL pública desplegada todavía. Durante la prueba se puede presentar en local; el despliegue externo queda pendiente de definir cuenta y destino.
+La aplicación está lista para desplegar en Vercel. El despliegue requiere conectar la cuenta de Vercel y configurar la clave del proveedor en las variables seguras del proyecto.
+
+### Despliegue en Vercel
+
+Importa el repositorio `OlavGuerrero89/periferia_test` desde Vercel y usa la rama `codex/fix-specs-ci`. Next.js detecta automáticamente los comandos de build y las rutas API. En las variables de entorno del proyecto configura `OPENAI_API_KEY` como secreto y `DATA_DIR=fixtures/demo/reto-01` para probar con datos sintéticos. No subas `.env.local` ni la clave a GitHub.
 
 ## Fixtures reales del reto
 

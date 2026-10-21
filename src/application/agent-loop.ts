@@ -68,7 +68,7 @@ export class AgentApplication {
   private readonly fixtureRoot: string;
   private readonly maxIterations: number;
 
-  constructor(adapter: LlmAdapter, projectRoot = process.cwd(), maxIterations = Number(process.env.AGENT_MAX_ITERATIONS ?? 12), fixtureRoot = process.env.DATA_DIR ?? "fixtures/reto-01") {
+  constructor(adapter: LlmAdapter, projectRoot = process.cwd(), maxIterations = Number(process.env.AGENT_MAX_ITERATIONS ?? 12), fixtureRoot = process.env.DATA_DIR ?? "fixtures/demo/reto-01") {
     this.adapter = adapter;
     this.projectRoot = projectRoot;
     this.maxIterations = boundedInteger(maxIterations, 12, 1, 25);
