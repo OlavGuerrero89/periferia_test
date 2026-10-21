@@ -1,7 +1,3 @@
-
-## `D:\Joyita_hub\periferia_test\specs\07-test-strategy.md`
-
-~~~markdown
 # Estrategia de pruebas
 
 ## Propósito
