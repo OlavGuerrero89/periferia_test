@@ -105,11 +105,13 @@ Configura `.env` para Compose y ejecuta. Para usar los fixtures reales, cambia `
 docker compose up --build
 ```
 
-La aplicación está lista para desplegar en Vercel. El despliegue requiere conectar la cuenta de Vercel y configurar la clave del proveedor en las variables seguras del proyecto.
+### Despliegue de prueba en Render
 
-### Despliegue en Vercel
+El archivo `render.yaml` define un servicio web Docker para la rama `codex/fix-specs-ci`, con fixtures sintéticos y la comprobación de salud en `/api/health`. En Render crea un Blueprint y conecta el repositorio `OlavGuerrero89/periferia_test`; Render leerá esa configuración y publicará la URL cuando termine el build. La primera creación requiere autorizar el acceso de Render al repositorio.
 
-Importa el repositorio `OlavGuerrero89/periferia_test` desde Vercel y usa la rama `codex/fix-specs-ci`. Next.js detecta automáticamente los comandos de build y las rutas API. En las variables de entorno del proyecto configura `OPENAI_API_KEY` como secreto y `DATA_DIR=fixtures/demo/reto-01` para probar con datos sintéticos. No subas `.env.local` ni la clave a GitHub.
+`OPENAI_API_KEY` es opcional para abrir y consultar la demo; sin ella, el chat usa la respuesta de fallback y el endpoint `/api/health` indica `configured: false`. Para probar el modelo real, agrega la clave como variable secreta desde Render; nunca la escribas en el YAML ni la subas a GitHub.
+
+La configuración usa el plan gratuito: el servicio puede suspenderse tras 15 minutos sin tráfico y tardar en despertar. Esta app mantiene sesiones en memoria y genera archivos en el disco efímero del servicio, por lo que sirve como demo compartible, no como almacenamiento persistente.
 
 ## Fixtures reales del reto
 

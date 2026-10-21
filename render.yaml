@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: periferia-test-demo
+    runtime: docker
+    plan: free
+    branch: codex/fix-specs-ci
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATA_DIR
+        value: fixtures/demo/reto-01
+      - key: OPENAI_API_KEY
+        sync: false
