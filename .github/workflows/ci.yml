@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
-          version: version: 10.34.7
+        version: 11.25.0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
