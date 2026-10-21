@@ -2,124 +2,169 @@
 
 ## Propósito
 
-Verificar las reglas del reto desde las unidades pequeñas hasta la interfaz y la demo. Las pruebas usan datos sintéticos y no requieren una clave de proveedor LLM, salvo pruebas manuales específicas del adaptador real.
+Definir cómo verificar los requisitos y las reglas del reto desde las funciones de dominio hasta la API, la interfaz y la demo.
+
+Las pruebas usan datos sintéticos. La suite automatizada no requiere una clave de proveedor LLM ni depende de servicios externos.
 
 ## Principios
 
-- Las reglas de dominio deben probarse sin Next.js ni llamadas de red.
-- Las pruebas usan fechas fijas para evaluar vencimientos.
-- Las pruebas de herramientas usan fixtures sintéticos y directorios temporales de salida.
+- Las reglas de dominio se prueban sin Next.js, llamadas de red ni un modelo LLM.
+- Las fechas de prueba son fijas e inyectadas.
+- Las pruebas de herramientas usan fixtures sintéticas y directorios temporales.
 - Ninguna prueba escribe fuera de un directorio temporal o de `out/`.
-- Los errores se prueban como resultados controlados, no solo como excepciones.
-- Las pruebas del ciclo del agente usan un adaptador LLM falso y respuestas predeterminadas.
-- Las pruebas de integración no dependen de servicios externos.
+- Las fixtures entregadas por el reto se tratan como solo lectura.
+- Las pruebas verifican resultados y efectos en archivos, no solo que una función no lance errores.
+- Los errores deben tener resultados controlados y comprobables.
+- El ciclo del agente usa un adaptador LLM falso con respuestas predeterminadas.
+- Las pruebas automatizadas no llaman proveedores, portales ni destinatarios reales.
 
 ## Niveles de prueba
 
 ### Unitarias de dominio
 
-Cubren:
+Verifican, como mínimo:
 
-- normalización de país, formato y etiquetas;
-- resolución de sinónimos del glosario;
-- asignación de estados de campo;
-- umbral de confianza `< 0.8`;
-- regla de identificador tributario por país;
-- nota exacta `identificador extranjero`;
-- comparación de fechas de vigencia;
-- cálculo de `listo_para_firma`;
-- filtrado de campos bancarios.
+- Normalización de país, formato y etiquetas.
+- Resolución de etiquetas y sinónimos documentados.
+- Estados `lleno`, `faltante` y `requiere_confirmacion`.
+- Procedencia requerida para un campo `lleno`.
+- Umbral de confianza menor a `0.8` y caso límite igual a `0.8`.
+- Identificador tributario por país y nota exacta `identificador extranjero`.
+- Comparación de fechas de vigencia, incluida la fecha igual a `vigencia_hasta`.
+- Cálculo de `listo_para_firma`.
+- Exclusión y enmascaramiento de datos bancarios.
 
 ### Integración de herramientas
 
-Cubren cada herramienta con filesystem temporal:
+Cada herramienta se prueba contra un filesystem temporal:
 
-- leer un caso válido;
-- manejar caso inexistente, JSON corrupto y plantilla incompleta;
-- mapear un campo conocido, uno desconocido y uno ambiguo;
-- generar Excel, PDF y Markdown de portal;
-- crear el paquete con soportes presentes, ausentes y vencidos;
-- impedir rutas fuera de `out/`;
-- validar el registro JSONL;
-- impedir la simulación de envío sin confirmación.
+- Leer un caso válido.
+- Manejar caso inexistente, JSON inválido y plantilla incompleta.
+- Mapear un campo conocido, uno desconocido y uno ambiguo.
+- Generar Excel usando exclusivamente la hoja y las celdas indicadas.
+- Generar PDF con campos en el orden esperado.
+- Generar Markdown para portal sin automatizar acceso al portal.
+- Crear el paquete con soportes presentes, ausentes y vencidos.
+- Impedir lectura fuera de las fixtures y escritura fuera de `out/`.
+- Verificar que las fixtures no cambian.
+- Validar el contenido y formato de `log.jsonl`.
+- Impedir crear `ENVIO-SIMULADO.md` sin aprobación válida.
+- Manejar errores de lectura y escritura sin reportar éxito.
+
+### Aprobación humana
+
+Con un estado de sesión controlado, verificar:
+
+- No existe acción pendiente y el usuario responde “sí”.
+- El usuario confirma en el turno inmediatamente posterior para el mismo caso.
+- El usuario rechaza la acción.
+- La respuesta es ambigua.
+- La respuesta corresponde a otro caso.
+- La aprobación llega después de otro turno y la solicitud ya expiró.
+- La misma confirmación se procesa más de una vez.
+- El archivo de salida ya existe.
+- El archivo solo se crea en `out/<caso>/ENVIO-SIMULADO.md`.
+- Ningún caso de prueba realiza envío, firma o carga externa.
 
 ### Ciclo del agente
 
 Con un adaptador LLM falso, verificar:
 
-- una respuesta final sin herramientas;
-- una llamada a herramienta seguida de respuesta final;
-- varias herramientas en un turno;
-- validación de argumentos inválidos;
-- límite de iteraciones;
-- error del proveedor y timeout;
-- inclusión de llamadas en la respuesta del chat;
-- confirmación válida, ambigua, rechazada, expirada y para otro caso.
+- Una respuesta final sin llamadas a herramientas.
+- Una llamada a herramienta seguida de respuesta final.
+- Varias llamadas a herramientas dentro del límite configurado.
+- Argumentos inválidos rechazados por el esquema.
+- Fin del ciclo al alcanzar el límite de iteraciones.
+- Error del proveedor y timeout representados como errores controlados.
+- La respuesta incluye las llamadas a herramientas que deben mostrarse.
+- Las herramientas solo usan los datos devueltos por fuentes autorizadas.
+- El agente no completa valores usando conocimiento general.
+- La aprobación válida, ambigua, rechazada, expirada y asociada a otro caso.
 
 ### API
 
 Verificar:
 
-- `POST /api/chat` acepta una entrada válida y rechaza una inválida;
-- `GET /api/sessions/:id` devuelve el historial correcto o un error claro;
-- `GET /api/health` devuelve estado y modelo sin incluir secretos;
-- errores HTTP tienen forma estable;
-- las rutas no exponen trazas internas ni variables de entorno.
+- `POST /api/chat` acepta una entrada válida y rechaza una inválida.
+- `GET /api/sessions/:id` devuelve el historial correcto o un error claro.
+- `GET /api/health` devuelve el estado sin exponer secretos.
+- Los errores HTTP conservan una estructura estable.
+- Las rutas no exponen trazas internas ni variables de entorno.
+- La respuesta expone el estado de confirmación sin afirmar que una acción fallida fue completada.
 
 ### Interfaz
 
 Verificar manualmente o con pruebas de interfaz que:
 
-- se ve el historial de mensajes;
-- se muestra el indicador de espera;
-- se muestran las llamadas a herramientas y su resultado resumido;
-- la confirmación se destaca y nombra la acción y el caso;
-- los errores son legibles;
-- la interfaz no incluye claves ni variables privadas.
+- Se muestra el historial de mensajes.
+- Se muestra el indicador de espera durante una respuesta.
+- Las llamadas a herramientas se presentan con resultados resumidos.
+- La solicitud de confirmación identifica la acción y el caso.
+- Los errores se muestran con lenguaje claro.
+- La interfaz no presenta acciones no realizadas como exitosas.
+- No se muestran claves, secretos ni datos bancarios innecesarios.
 
 ### Demo sin modelo
 
-Ejecutar `pnpm demo` sin clave de proveedor y verificar:
+Ejecutar `pnpm demo` sin clave de proveedor y verificar que:
 
-- procesa todos los casos disponibles;
-- llama directamente a las mismas herramientas del servidor;
-- limpia solo su propio directorio de salida;
-- imprime resumen por caso;
-- resultados funcionales iguales entre ejecuciones, salvo timestamps.
+- Procesa todos los casos disponibles.
+- Usa las mismas herramientas del servidor.
+- Limpia únicamente su propio directorio de salida.
+- Imprime un resumen por caso y sus pendientes.
+- No escribe sobre fixtures.
+- Produce resultados funcionales iguales entre ejecuciones, salvo timestamps y datos de auditoría variables.
 
-## Matriz de cobertura inicial
+## Matriz mínima de cobertura
 
 | Área | Casos mínimos |
 |---|---|
-| Lectura | caso válido, caso ausente, solicitud inválida, plantilla inválida |
-| Mapeo | coincidencia exacta, sinónimo, faltante, confianza menor a 0.8, identificador extranjero |
-| Excel | escribe en hoja/celda indicada, no modifica fixtures, campo faltante sin valor inventado |
-| PDF | conserva orden, etiqueta campos faltantes, genera archivo válido |
-| Portal | crea Markdown copiable y no automatiza login |
-| Soportes | presente vigente, ausente, vencido, sin fecha de vigencia |
-| Paquete | soporte ausente bloquea firma, vencido bloquea firma, campo faltante solo no bloquea |
-| Seguridad | traversal de rutas, secretos en respuesta/log, datos bancarios no solicitados |
-| Confirmación | sin pregunta, confirmación inmediata, ambigua, rechazada, caso distinto, confirmación vencida |
-| Robustez | error de herramienta, error LLM, timeout, límite de iteraciones |
-| Demo | sin API key, múltiples ejecuciones, limpieza segura de `out/` |
+| Lectura | Caso válido, caso inexistente, solicitud inválida y plantilla inválida |
+| Mapeo | Coincidencia documentada, sinónimo, campo faltante, ambigüedad y confianza bajo el umbral |
+| Identificadores | CO, EC, PE, PA y HN; comprobar propuesta extranjera y nota requerida |
+| Excel | Hoja y celda correctas, valor faltante sin completar y fixtures sin cambios |
+| PDF | Orden de campos, pendientes visibles y archivo generado válido |
+| Portal | Markdown copiable y ausencia de login, carga o envío automatizados |
+| Soportes | Presente vigente, ausente, vencido y sin fecha de vigencia |
+| Paquete | Soporte ausente o vencido bloquea firma; campo faltante por sí solo no |
+| Datos sensibles | Dato bancario no solicitado excluido; número completo ausente de logs |
+| Rutas | Traversal de rutas, rutas absolutas y nombres de archivo no permitidos |
+| Confirmación | Sin solicitud, aprobación inmediata, rechazo, ambigüedad, otro caso y vencimiento |
+| Robustez | Error de herramienta, error LLM, timeout y límite de iteraciones |
+| Demo | Sin API key, varios casos, repetición y limpieza segura de salida |
 
 ## Fixtures y datos de prueba
 
-- Usar solo datos sintéticos.
-- No sobrescribir fixtures entregados por el reto.
-- Para casos de error, crear copias temporales o fixtures pequeños dentro de `tests/fixtures/`.
-- Inyectar `fechaEjecucion` para no depender del día en que se corren las pruebas.
-- Eliminar los directorios temporales al terminar incluso cuando una prueba falla.
+- Usar exclusivamente datos sintéticos.
+- No sobrescribir ni modificar fixtures entregadas por el reto.
+- Para escenarios de error, crear copias temporales o fixtures pequeñas dentro de `tests/fixtures/`.
+- Inyectar la fecha de ejecución para las pruebas de vigencia.
+- Usar directorios temporales para probar las escrituras.
+- Limpiar los directorios temporales al terminar, incluso si una prueba falla.
+- No guardar secretos ni datos personales reales en snapshots, logs o fixtures de prueba.
+
+## Comandos de verificación
+
+La verificación de entrega debe ejecutar, cuando esos scripts estén definidos en `package.json`:
+
+1. `pnpm install --frozen-lockfile`
+2. `pnpm typecheck`
+3. `pnpm lint`
+4. `pnpm test`
+5. `pnpm demo`
+6. `pnpm build`
+
+La instalación y CI deben usar la versión de pnpm fijada por el proyecto. En este repositorio, esa versión debe permanecer sincronizada con `package.json` y el workflow de CI.
 
 ## Criterios de salida
 
-Antes de considerar lista una entrega:
+La entrega se considera verificada cuando:
 
-1. `pnpm typecheck` termina sin errores.
-2. `pnpm lint` termina sin errores.
-3. `pnpm test` pasa todas las pruebas automatizadas.
-4. `pnpm demo` corre sin clave LLM.
-5. `pnpm build` termina correctamente.
-6. CI corre los mismos comandos con la versión de pnpm fijada en `package.json`.
-7. Las reglas P0 tienen pruebas automatizadas.
-8. Cualquier requisito parcial o pendiente aparece declarado en README o `SOLUCION.md`; no se presenta como implementado.
+- Los comandos de verificación terminan correctamente.
+- Las reglas P0 tienen pruebas automatizadas.
+- La demo funciona sin clave LLM.
+- Las pruebas no modifican fixtures ni escriben fuera de las rutas permitidas.
+- No hay pruebas automatizadas que dependan de servicios externos.
+- Las funciones de aprobación y envío simulado cumplen `specs/06-human-approval.md`.
+- Los requisitos parciales o pendientes aparecen en `README.md` o `SOLUCION.md`.
+- No se declara implementada una funcionalidad que solo esté descrita o simulada.
