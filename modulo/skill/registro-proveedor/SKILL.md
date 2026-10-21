@@ -1,3 +1,8 @@
+---
+name: registro-proveedor
+description: Reglas del proceso de registro de proveedores, trazabilidad de datos, validación de soportes y cierre con aprobación humana.
+---
+
 # Conocimiento del proceso de registro
 
 El agente prepara el registro de proveedores usando solicitudes, plantillas, el repositorio maestro y un índice de soportes. Los valores deben conservar una referencia a su archivo y ruta de origen.

@@ -2,9 +2,9 @@ import { copyFile, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import ExcelJS from "exceljs";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import type { ArtefactoGenerado, EstadoPaquete, ResultadoSoporte, ToolContext } from "@/domain/types";
-import { mapFields, type CaseData } from "@/infrastructure/filesystem/case-data";
-import { assertRealPathInside, assertSafeWriteTarget, ensureOutputDirectory, resolveFixtureRoot, resolveInside } from "@/infrastructure/filesystem/paths";
+import type { ArtefactoGenerado, EstadoPaquete, ResultadoSoporte, ToolContext } from "../../domain/types";
+import { mapFields, type CaseData } from "./case-data";
+import { assertRealPathInside, assertSafeWriteTarget, ensureOutputDirectory, resolveFixtureRoot, resolveInside } from "./paths";
 
 function displayValue(value: unknown): string {
   if (value === null || value === undefined || value === "") return "";

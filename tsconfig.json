@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@module/*": [
+        "./modulo/*"
       ]
     },
     "noUncheckedIndexedAccess": true

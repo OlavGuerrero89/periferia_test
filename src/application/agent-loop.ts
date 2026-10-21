@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { AprobacionPendiente } from "@/domain/types";
 import type { LlmAdapter, LlmMessage } from "@/infrastructure/llm/adapter";
-import { executeTool, proveedorTools, type ProviderTool } from "@/tools/proveedor";
+import { executeTool, proveedorTools, type ProviderTool } from "@module/tools/proveedor";
 
 export interface VisibleToolCall {
   name: string;
@@ -172,12 +172,18 @@ export class AgentApplication {
   }
 
   private async loadSystemPrompt(): Promise<string> {
-    const promptPath = path.join(this.projectRoot, "agent", "prompt.md");
-    const knowledgePath = path.join(this.projectRoot, "src", "knowledge", "registro-proveedor.md");
+    const promptPath = path.join(this.projectRoot, "modulo", "agent.md");
+    const knowledgePath = path.join(this.projectRoot, "modulo", "skill", "registro-proveedor", "SKILL.md");
     const [prompt, knowledge] = await Promise.all([
-      readFile(promptPath, "utf8").catch(() => "Eres un agente de registro de proveedores. Sigue las reglas de seguridad del sistema."),
-      readFile(knowledgePath, "utf8").catch(() => ""),
+      readFile(promptPath, "utf8").then(stripFrontmatter).catch(() => "Eres un agente de registro de proveedores. Sigue las reglas de seguridad del sistema."),
+      readFile(knowledgePath, "utf8").then(stripFrontmatter).catch(() => ""),
     ]);
     return `${prompt}\n\n## Conocimiento autorizado del proceso\n${knowledge}`;
   }
+}
+
+function stripFrontmatter(markdown: string): string {
+  if (!markdown.startsWith("---\n")) return markdown.trim();
+  const end = markdown.indexOf("\n---\n", 4);
+  return end === -1 ? markdown.trim() : markdown.slice(end + 5).trim();
 }

@@ -24,8 +24,8 @@ La aplicación controla el flujo y las autorizaciones. El modelo interpreta la s
    - una respuesta ambigua, sobre otro caso o que no corresponda a la acción hace expirar la solicitud;
    - una solicitud expirada no autoriza la ejecución.
 4. La aplicación construye el contexto para el modelo con:
-   - las instrucciones de `agent/prompt.md`;
-   - el conocimiento permitido de `src/knowledge/`;
+   - el cuerpo de `modulo/agent.md` después de retirar su frontmatter;
+   - el conocimiento de `modulo/skill/registro-proveedor/SKILL.md` después de retirar su frontmatter;
    - el historial necesario de la sesión;
    - las definiciones de herramientas disponibles.
 5. El adaptador LLM consulta al proveedor.

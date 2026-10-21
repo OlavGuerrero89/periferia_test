@@ -1,7 +1,7 @@
 import { cp, mkdtemp, readdir, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { armar_paquete, generar_formulario, leer_solicitud, mapear_campos } from "./src/tools/proveedor";
+import { armar_paquete, generar_formulario, leer_solicitud, mapear_campos } from "./modulo/tools/proveedor";
 import type { ToolContext } from "./src/domain/types";
 
 async function main(): Promise<void> {

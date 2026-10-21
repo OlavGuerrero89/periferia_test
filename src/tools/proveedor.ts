@@ -1,11 +1,11 @@
 import { open } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import type { ResultadoHerramienta, ToolContext } from "@/domain/types";
-import { buildPackage, generateForm } from "@/infrastructure/filesystem/artifacts";
-import { getSupportStatuses, loadCase, mapFields } from "@/infrastructure/filesystem/case-data";
-import { assertSafeWriteTarget, ensureOutputDirectory, resolveInside, validateCaseId } from "@/infrastructure/filesystem/paths";
-import { writeAuditLog } from "@/infrastructure/logging/audit";
+import type { ResultadoHerramienta, ToolContext } from "../domain/types";
+import { buildPackage, generateForm } from "../infrastructure/filesystem/artifacts";
+import { getSupportStatuses, loadCase, mapFields } from "../infrastructure/filesystem/case-data";
+import { assertSafeWriteTarget, ensureOutputDirectory, resolveInside, validateCaseId } from "../infrastructure/filesystem/paths";
+import { writeAuditLog } from "../infrastructure/logging/audit";
 
 const caseArgs = z.object({ casoId: z.string().min(1).max(80).describe("Identificador de la carpeta del caso; no es una ruta.") }).strict();
 

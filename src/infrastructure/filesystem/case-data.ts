@@ -1,8 +1,8 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import type { CampoSolicitado, CasoNormalizado, Formato, Pais, ResultadoSoporte, ResolucionCampo, ToolContext } from "@/domain/types";
-import { assertRealPathInside, resolveFixtureRoot, resolveInside, validateCaseId } from "@/infrastructure/filesystem/paths";
+import type { CampoSolicitado, CasoNormalizado, Formato, Pais, ResultadoSoporte, ResolucionCampo, ToolContext } from "../../domain/types";
+import { assertRealPathInside, resolveFixtureRoot, resolveInside, validateCaseId } from "./paths";
 
 const SolicitudSchema = z.object({
   id: z.string().optional(),

@@ -8,7 +8,7 @@ import type { ToolContext } from "@/domain/types";
 import { buildPackage, generateForm } from "@/infrastructure/filesystem/artifacts";
 import { getSupportStatuses, loadCase, mapFields } from "@/infrastructure/filesystem/case-data";
 import { resolveInside } from "@/infrastructure/filesystem/paths";
-import { simular_envio } from "@/tools/proveedor";
+import { simular_envio } from "@module/tools/proveedor";
 
 const roots: string[] = [];
 

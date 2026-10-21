@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ProviderTool } from "@/tools/proveedor";
+import type { ProviderTool } from "@module/tools/proveedor";
 
 function boundedInteger(raw: string | undefined, fallback: number, minimum: number, maximum: number): number {
   const value = Number(raw ?? fallback);

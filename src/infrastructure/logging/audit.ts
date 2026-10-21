@@ -1,7 +1,7 @@
 import { appendFile } from "node:fs/promises";
 import path from "node:path";
-import type { ToolContext } from "@/domain/types";
-import { assertSafeWriteTarget, ensureOutputDirectory, resolveInside, validateCaseId } from "@/infrastructure/filesystem/paths";
+import type { ToolContext } from "../../domain/types";
+import { assertSafeWriteTarget, ensureOutputDirectory, resolveInside, validateCaseId } from "../filesystem/paths";
 
 export async function writeAuditLog(
   ctx: ToolContext,

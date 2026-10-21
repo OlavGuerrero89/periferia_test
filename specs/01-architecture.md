@@ -16,17 +16,19 @@ No se agrega una base de datos para el alcance inicial. Las sesiones pueden mant
 | API | `src/app/api/` | Validar solicitudes HTTP, invocar la aplicación y devolver respuestas con estructura estable. | Procesar archivos directamente o implementar reglas de negocio. |
 | Aplicación | `src/application/` | Coordinar sesiones, flujo del agente, llamadas a herramientas y límites de ejecución. | Acceder al filesystem fuera de las interfaces y herramientas definidas. |
 | Dominio | `src/domain/` | Contener tipos, esquemas y reglas puras de negocio, validación y estados. | Depender de Next.js, del proveedor LLM o del filesystem. |
-| Herramientas | `src/tools/` | Leer datos autorizados, mapear campos, generar archivos, armar paquetes y crear el envío simulado autorizado. | Firmar, enviar información real, cargar archivos en portales o ejecutar comandos. |
+| Herramientas | `src/tools/`, expuestas desde `modulo/tools/proveedor.ts` | Leer datos autorizados, mapear campos, generar archivos, armar paquetes y crear el envío simulado autorizado. | Firmar, enviar información real, cargar archivos en portales o ejecutar comandos. |
 | Infraestructura | `src/infrastructure/` | Adaptar filesystem, registro de eventos y proveedor LLM a interfaces usadas por la aplicación. | Definir reglas de negocio o permitir acceso arbitrario a archivos. |
-| Prompt del agente | `agent/prompt.md` | Definir instrucciones de comportamiento, límites y uso de herramientas. | Ser fuente de datos de clientes o reemplazar las validaciones del dominio. |
-| Conocimiento del proceso | `src/knowledge/` | Explicar el proceso, los documentos y las reglas generales del reto. | Contener valores de los casos o datos sensibles de fixtures. |
+| Módulo reusable | `modulo/` | Compartir prompt, herramientas y conocimiento con otras plataformas de agentes. | Depender de rutas o APIs del servidor Next.js. |
 | Demo | `demo.ts` | Ejecutar las herramientas con todos los casos sin requerir modelo ni clave LLM. | Alterar fixtures o borrar datos ajenos a su directorio de salida. |
 
 ## Estructura objetivo
 
 ```text
-agent/
-└── prompt.md
+modulo/
+├── agent.md
+├── tools/
+│   └── proveedor.ts
+└── skill/registro-proveedor/SKILL.md
 src/
 ├── app/
 │   ├── api/
@@ -47,7 +49,6 @@ src/
 │   ├── filesystem/
 │   ├── llm/
 │   └── logging/
-├── knowledge/
 └── tools/
     └── proveedor.ts
 fixtures/

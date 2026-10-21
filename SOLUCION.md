@@ -18,7 +18,7 @@ flowchart LR
   APP --> LLM[Adaptador OpenAI]
 ```
 
-El comportamiento y las restricciones están en `agent/prompt.md`; el conocimiento general del proceso está en `src/knowledge/registro-proveedor.md`; las operaciones deterministas viven en `src/tools/proveedor.ts` y `src/infrastructure/filesystem/`. El dominio no depende del modelo.
+El módulo reusable vive en `modulo/`: `agent.md` aporta el prompt con los metadatos de la plataforma, `skill/registro-proveedor/SKILL.md` contiene el conocimiento y `tools/proveedor.ts` expone las herramientas que usa la aplicación. El ciclo carga el cuerpo Markdown sin frontmatter. La lógica determinista se implementa en `src/tools/proveedor.ts` y `src/infrastructure/filesystem/`, sin depender del servidor Next.js.
 
 ## 3. Ciclo del agente y aprobación
 
@@ -64,7 +64,7 @@ Las credenciales deberían provenir de un gestor de secretos con acceso de míni
 | HU-4 Paquete | Hecho para el contrato de soportes | Incluye formulario, soportes presentes, checklist y borrador; validar con el índice real. |
 | HU-5 Errores | Hecho a nivel de herramienta/API | Errores normalizados y pruebas de rutas y confirmación; faltan pruebas con cada fixture real. |
 | API y chat | Parcial | API, interfaz y sesiones funcionan localmente; requiere clave del modelo para conversación real y despliegue público pendiente. |
-| Bonus módulo reusable | No hecho | No se creó `modulo/`. |
+| Bonus módulo reusable | Hecho | Prompt, skill y entrada de herramientas en `modulo/`; la aplicación carga e importa esas mismas piezas. |
 
 ## 9. Uso de IA
 

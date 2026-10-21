@@ -9,6 +9,7 @@ Aplicación independiente para leer solicitudes de registro, mapear campos con f
 - Excel P0, PDF P1 y valores copiables para portal P2.
 - Checklist de soportes, borrador de correo, auditoría JSONL y confirmación inmediata para crear el envío simulado local.
 - Incluye `demo-sintetica`, un caso de prueba inventado. No contiene datos de clientes ni documentos reales.
+- Incluye el módulo reusable en `modulo/`: prompt, skill del proceso y herramientas importables sin iniciar el servidor Next.js.
 - Los fixtures originales del reto aún deben copiarse a `fixtures/reto-01/` para validar los casos de entrega.
 
 ## Requisitos
@@ -74,6 +75,22 @@ Ejemplo local:
 
 ```bash
 curl http://localhost:3000/api/health
+```
+
+## Módulo para otras plataformas de agentes
+
+`modulo/agent.md` declara `mode: primary` y permisos `edit: deny`, `bash: deny`; la aplicación usa su cuerpo como prompt de sistema. `modulo/skill/registro-proveedor/SKILL.md` contiene el conocimiento que también carga el agente. El punto de entrada `modulo/tools/proveedor.ts` exporta las mismas herramientas que consume el chat.
+
+Las herramientas pueden importarse desde un runtime Node.js/TypeScript sin levantar Next.js. El consumidor debe instalar las dependencias declaradas en `package.json`, proporcionar el `ToolContext` y definir sus directorios de fixtures y salida. Ejemplo:
+
+```ts
+import { proveedorTools, executeTool } from "./modulo/tools/proveedor";
+
+const tool = proveedorTools.find((item) => item.name === "proveedor_leer_solicitud");
+if (tool) {
+  const result = await executeTool(tool, { casoId: "demo-sintetica" }, context);
+  console.log(result);
+}
 ```
 
 ## Artefactos

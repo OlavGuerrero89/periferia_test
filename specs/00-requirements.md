@@ -53,7 +53,7 @@ Construir una aplicación independiente de registro de proveedores con chat, bac
 - Nombres de herramientas visibles para el modelo: `<archivo>_<export>`. Contrato mínimo: `proveedor_leer_solicitud`, `proveedor_mapear_campos`, `proveedor_generar_formulario`, `proveedor_armar_paquete` y `proveedor_simular_envio`.
 - El contexto de ejecución contiene la raíz del proyecto y el ID de sesión. Las rutas se resuelven desde la raíz, nunca desde rutas absolutas específicas de una máquina.
 - Los fixtures son de solo lectura; los artefactos generados se escriben en `out/`.
-- El prompt de sistema vive en `agent/prompt.md`; el conocimiento del proceso vive en `src/knowledge/`; las operaciones viven en `src/tools/`.
+- El prompt del sistema y el conocimiento reusable viven en `modulo/`; las herramientas compartidas se exponen desde `modulo/tools/proveedor.ts`.
 - El adaptador LLM implementa una interfaz propia para poder cambiar de proveedor sin reescribir el ciclo del agente.
 - El paquete prepara la revisión y firma humana. No firma ni envía a clientes.
 
