@@ -1,0 +1,11 @@
+{
+  "id": "demo-portal-sintetica",
+  "de": "compras@example.invalid",
+  "asunto": "Acceso a portal sintético",
+  "fecha": "2026-10-21",
+  "pais": "CO",
+  "cliente": "Portal Sintético",
+  "cuerpo": "Preparar los valores para transcripción manual.",
+  "formato": "portal",
+  "adjuntos": []
+}

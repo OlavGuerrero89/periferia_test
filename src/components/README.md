@@ -1,1 +1,1 @@
-Componentes del chat, tool calls y aprobación humana; pendientes del PRD.
+La interfaz del chat está implementada en `src/app/page.tsx` para mantener el alcance inicial compacto. Muestra historial, estado de espera, llamadas a herramientas y confirmaciones pendientes. Si se agregan componentes reutilizables, se ubican en esta carpeta y deben recibir solo datos serializables, sin acceso directo a fixtures ni a secretos.

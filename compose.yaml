@@ -7,7 +7,7 @@ services:
       - path: .env
         required: false
     environment:
-      - DATA_DIR=/app/fixtures/reto-01
-      - OUTPUT_DIR=/app/outputs
+      - DATA_DIR=./fixtures/selected
     volumes:
-      - ./outputs:/app/outputs
+      - ${DATA_DIR_HOST:-./fixtures/demo/reto-01}:/app/fixtures/selected:ro
+      - ./out:/app/out

@@ -1,0 +1,11 @@
+{
+  "id": "demo-sintetica",
+  "de": "compras@example.invalid",
+  "asunto": "Registro de proveedor — demostración sintética",
+  "fecha": "2026-10-21",
+  "pais": "CO",
+  "cliente": "Cliente Sintético",
+  "cuerpo": "Solicitamos completar el formulario de registro con los datos disponibles.",
+  "formato": "xlsx",
+  "adjuntos": []
+}
