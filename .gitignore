@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.env
+.env.local
+outputs/
+coverage/
+*.tsbuildinfo
+fixtures/reto-01/repositorio/
+inputs/
+
+/periferia-ai-ready.zip
