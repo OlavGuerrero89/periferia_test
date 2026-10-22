@@ -5,5 +5,6 @@ export async function GET() {
     provider: "openai",
     model: process.env.OPENAI_MODEL || "gpt-6-luna",
     configured: Boolean(process.env.OPENAI_API_KEY),
+    fallbackAvailable: true,
   });
 }

@@ -109,7 +109,7 @@ docker compose up --build
 
 El archivo `render.yaml` define un servicio web Docker para la rama `codex/fix-specs-ci`, con fixtures sintéticos y la comprobación de salud en `/api/health`. En Render crea un Blueprint y conecta el repositorio `OlavGuerrero89/periferia_test`; Render leerá esa configuración y publicará la URL cuando termine el build. La primera creación requiere autorizar el acceso de Render al repositorio.
 
-`OPENAI_API_KEY` es opcional para abrir y consultar la demo; sin ella, el chat usa la respuesta de fallback y el endpoint `/api/health` indica `configured: false`. Para probar el modelo real, agrega la clave como variable secreta desde Render; nunca la escribas en el YAML ni la subas a GitHub.
+`OPENAI_API_KEY` es opcional para abrir la demo. Sin ella, o si OpenAI no puede responder, el chat entra en modo determinista: ante `Procesa el caso <id>` ejecuta las herramientas de lectura, mapeo, formulario y paquete sin modelo. Si no identifica un caso explícito, explica cómo continuar sin iniciar herramientas. Tras preparar un paquete, pide confirmación humana antes de crear `ENVIO-SIMULADO.md`. `/api/health` indica `configured: false` cuando no hay clave y anuncia que el respaldo está disponible. Para probar el modelo real, agrega la clave como variable secreta desde Render; nunca la escribas en el YAML ni la subas a GitHub.
 
 La configuración usa el plan gratuito: el servicio puede suspenderse tras 15 minutos sin tráfico y tardar en despertar. Esta app mantiene sesiones en memoria y genera archivos en el disco efímero del servicio, por lo que sirve como demo compartible, no como almacenamiento persistente.
 

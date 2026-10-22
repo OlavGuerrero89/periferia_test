@@ -76,6 +76,10 @@ Con un adaptador LLM falso, verificar:
 - Argumentos inválidos rechazados por el esquema.
 - Fin del ciclo al alcanzar el límite de iteraciones.
 - Error del proveedor y timeout representados como errores controlados.
+- Ausencia de clave, credencial rechazada, límite/cuota y proveedor temporalmente no disponible producen respuestas útiles con `mode: "fallback"`.
+- Un caso explícito en modo `fallback` ejecuta lectura, mapeo, formulario y paquete con las mismas herramientas; no crea `ENVIO-SIMULADO.md` hasta recibir la confirmación inmediata.
+- Una entrada sin caso explícito no ejecuta herramientas. Si hubo llamadas de herramientas antes del error del proveedor, el fallback no las repite y las presenta fielmente.
+- El fallback conserva la sesión y no presenta como completadas las operaciones que fallaron.
 - La respuesta incluye las llamadas a herramientas que deben mostrarse.
 - Las herramientas solo usan los datos devueltos por fuentes autorizadas.
 - El agente no completa valores usando conocimiento general.

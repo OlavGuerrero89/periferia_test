@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { AprobacionPendiente } from "@/domain/types";
 import type { LlmAdapter, LlmMessage } from "@/infrastructure/llm/adapter";
+import { buildFallbackReply, extractCaseId, getProviderGuidance } from "@/application/fallback";
 import { executeTool, proveedorTools, type ProviderTool } from "@module/tools/proveedor";
 
 export interface VisibleToolCall {
@@ -11,7 +12,7 @@ export interface VisibleToolCall {
   summary: string;
 }
 
-export interface ConversationMessage { role: "user" | "assistant"; content: string; createdAt: string; tools?: VisibleToolCall[]; needsConfirmation?: boolean }
+export interface ConversationMessage { role: "user" | "assistant"; content: string; createdAt: string; tools?: VisibleToolCall[]; needsConfirmation?: boolean; mode?: "model" | "fallback" | "system" }
 
 export interface ChatSession {
   id: string;
@@ -28,6 +29,7 @@ export interface ProcessResult {
   toolCalls: VisibleToolCall[];
   needsConfirmation: boolean;
   sessionId: string;
+  mode: "model" | "fallback" | "system";
 }
 
 function boundedInteger(raw: number, fallback: number, minimum: number, maximum: number): number {
@@ -105,14 +107,14 @@ export class AgentApplication {
           : `No se pudo completar el envío simulado: ${result.error.mensaje}`;
         session.messages.push({ role: "assistant", content: reply, createdAt: new Date().toISOString(), tools: [{ name: "proveedor_simular_envio", arguments: { casoId: pending.casoId }, ok: result.ok, summary: result.ok ? "Archivo local creado; no hubo envío externo." : result.error.mensaje }] });
         session.llmMessages.push({ role: "user", content: message }, { role: "assistant", content: reply });
-        return { reply, toolCalls: [{ name: "proveedor_simular_envio", arguments: { casoId: pending.casoId }, ok: result.ok, summary: result.ok ? "Archivo local creado; no hubo envío externo." : result.error.mensaje }], needsConfirmation: false, sessionId };
+        return { reply, toolCalls: [{ name: "proveedor_simular_envio", arguments: { casoId: pending.casoId }, ok: result.ok, summary: result.ok ? "Archivo local creado; no hubo envío externo." : result.error.mensaje }], needsConfirmation: false, sessionId, mode: "system" };
       }
       if (pending.creadaEnTurno === session.turn - 1 && isNegative(message)) {
         pending.estado = "rechazado";
         const reply = `Entendido. No creé el envío simulado para el caso ${pending.casoId}.`;
         session.messages.push({ role: "assistant", content: reply, createdAt: new Date().toISOString() });
         session.llmMessages.push({ role: "user", content: message }, { role: "assistant", content: reply });
-        return { reply, toolCalls: [], needsConfirmation: false, sessionId };
+        return { reply, toolCalls: [], needsConfirmation: false, sessionId, mode: "system" };
       }
       pending.estado = "expirado";
     }
@@ -123,6 +125,7 @@ export class AgentApplication {
     const visibleCalls: VisibleToolCall[] = [];
     let preparedCaseId: string | undefined;
     let finalText = "";
+    let mode: ProcessResult["mode"] = "model";
 
     for (let iteration = 0; iteration < this.maxIterations; iteration += 1) {
       const requestEstimate = Math.ceil(JSON.stringify(conversation).length / 4);
@@ -134,7 +137,15 @@ export class AgentApplication {
       let reply;
       try { reply = await this.adapter.complete(conversation, proveedorTools); }
       catch (error) {
-        finalText = error instanceof Error ? error.message : "El proveedor de lenguaje no respondió. Intenta de nuevo.";
+        mode = "fallback";
+        if (visibleCalls.length === 0) {
+          const fallback = await this.runDeterministicFallback(message, error, sessionId, now);
+          visibleCalls.push(...fallback.toolCalls);
+          finalText = fallback.reply;
+          preparedCaseId = fallback.preparedCaseId;
+        } else {
+          finalText = buildFallbackReply(error, visibleCalls);
+        }
         break;
       }
       session.estimatedTokens += reply.inputTokens !== undefined
@@ -167,8 +178,8 @@ export class AgentApplication {
     }
     session.llmMessages = conversation.filter(item => item.role !== "system");
     session.llmMessages.push({ role: "assistant", content: finalText });
-    session.messages.push({ role: "assistant", content: finalText, createdAt: new Date().toISOString(), tools: visibleCalls, needsConfirmation: Boolean(preparedCaseId) });
-    return { reply: finalText, toolCalls: visibleCalls, needsConfirmation: session.pendingApproval?.estado === "esperando_confirmacion", sessionId };
+    session.messages.push({ role: "assistant", content: finalText, createdAt: new Date().toISOString(), tools: visibleCalls, needsConfirmation: Boolean(preparedCaseId), mode });
+    return { reply: finalText, toolCalls: visibleCalls, needsConfirmation: session.pendingApproval?.estado === "esperando_confirmacion", sessionId, mode };
   }
 
   private async loadSystemPrompt(): Promise<string> {
@@ -179,6 +190,42 @@ export class AgentApplication {
       readFile(knowledgePath, "utf8").then(stripFrontmatter).catch(() => ""),
     ]);
     return `${prompt}\n\n## Conocimiento autorizado del proceso\n${knowledge}`;
+  }
+
+  private async runDeterministicFallback(message: string, error: unknown, sessionId: string, now: Date): Promise<{ reply: string; toolCalls: VisibleToolCall[]; preparedCaseId?: string }> {
+    const casoId = extractCaseId(message);
+    if (!casoId) return { reply: buildFallbackReply(error, []), toolCalls: [] };
+
+    const calls: VisibleToolCall[] = [];
+    const context = { projectRoot: this.projectRoot, fixtureRoot: this.fixtureRoot, sessionId, now };
+    const run = async <T>(name: string, args: { casoId: string }): Promise<T | undefined> => {
+      const tool = proveedorTools.find(item => item.name === name);
+      if (!tool) return undefined;
+      const result = await executeTool(tool as ProviderTool, args, context);
+      calls.push({ name, arguments: args, ok: result.ok, summary: safeSummary(result) });
+      return result.ok ? result.data as T : undefined;
+    };
+
+    const read = await run<{ caso: { casoId: string; cliente: string; formato: string } }>("proveedor_leer_solicitud", { casoId });
+    if (!read) return { reply: `Modo de respaldo determinista: no pude leer el caso \`${casoId}\`. Revisa el identificador y los fixtures. No se generaron formularios ni se solicitó aprobación.`, toolCalls: calls };
+    const mapping = await run<{ campos: Array<{ resolucion: { estado: string } }> }>("proveedor_mapear_campos", { casoId });
+    if (!mapping) return { reply: `Modo de respaldo determinista: leí el caso \`${casoId}\`, pero no pude mapear sus campos. Revisa el resultado de la herramienta mostrado arriba.`, toolCalls: calls };
+    const form = await run<{ artefactos: Array<{ ruta: string }> }>("proveedor_generar_formulario", { casoId });
+    if (!form) return { reply: `Modo de respaldo determinista: leí y mapeé el caso \`${casoId}\`, pero no pude generar el formulario. Revisa el resultado de la herramienta mostrado arriba.`, toolCalls: calls };
+    const pack = await run<{ estado: { listoParaFirma: boolean; bloqueos: string[]; pendientes: string[] }; artefactos: Array<{ ruta: string }> }>("proveedor_armar_paquete", { casoId });
+    if (!pack) return { reply: `Modo de respaldo determinista: generé el formulario del caso \`${casoId}\`, pero no pude completar el paquete. Revisa el resultado de la herramienta mostrado arriba.`, toolCalls: calls };
+
+    const counts = mapping.campos.reduce((total, field) => {
+      if (field.resolucion.estado === "lleno") total.llenos += 1;
+      else if (field.resolucion.estado === "faltante") total.faltantes += 1;
+      else if (field.resolucion.estado === "requiere_confirmacion") total.confirmacion += 1;
+      return total;
+    }, { llenos: 0, faltantes: 0, confirmacion: 0 });
+    const formPath = form.artefactos[0]?.ruta ?? "formulario generado";
+    const packagePath = pack.artefactos[0]?.ruta ?? `out/${casoId}/paquete/`;
+    const blockerText = pack.estado.bloqueos.length ? ` Bloqueos: ${pack.estado.bloqueos.join("; ")}.` : "";
+    const reply = `Modo de respaldo determinista: ${getProviderGuidance(error)} Procesé el caso ${read.caso.cliente} (${casoId}) con las herramientas locales.\n\nCampos: ${counts.llenos} llenos, ${counts.faltantes} faltantes y ${counts.confirmacion} por confirmar. Formulario: ${formPath}. Paquete: ${packagePath}. Estado: ${pack.estado.listoParaFirma ? "listo para firma" : "no listo para firma"}.${blockerText}\n\nNo se envió ni firmó ningún documento. Revisa el paquete; responde sí o no para crear el archivo local ENVIO-SIMULADO.md.`;
+    return { reply, toolCalls: calls, preparedCaseId: casoId };
   }
 }
 

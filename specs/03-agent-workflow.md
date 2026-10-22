@@ -28,7 +28,7 @@ La aplicación controla el flujo y las autorizaciones. El modelo interpreta la s
    - el conocimiento de `modulo/skill/registro-proveedor/SKILL.md` después de retirar su frontmatter;
    - el historial necesario de la sesión;
    - las definiciones de herramientas disponibles.
-5. El adaptador LLM consulta al proveedor.
+5. El adaptador LLM consulta al proveedor. Si la consulta falla antes de ejecutar herramientas y el mensaje contiene un ID de caso explícito, la aplicación usa sin modelo las herramientas compartidas para leer, mapear, generar el formulario y preparar el paquete. Si el caso no es explícito, o ya hubo llamadas de herramientas en el turno, devuelve una respuesta de respaldo sin repetirlas. El respaldo no ejecuta `proveedor_simular_envio`; si preparó el paquete, conserva la solicitud de confirmación humana para el turno siguiente.
 6. Si el modelo responde sin solicitar herramientas, la aplicación finaliza el turno.
 7. Si el modelo solicita herramientas, la aplicación:
    - verifica que cada herramienta esté registrada y habilitada;
@@ -135,7 +135,7 @@ Los registros no contienen claves, credenciales ni números completos de cuentas
 - Argumentos inválidos: la herramienta no se ejecuta y la aplicación registra un error controlado.
 - Herramienta no registrada o deshabilitada: no se ejecuta.
 - Error de lectura o escritura: se comunica el fallo sin afirmar que el artefacto existe.
-- Error o timeout del proveedor LLM: el turno finaliza con un mensaje claro; la sesión no se pierde por una excepción no controlada.
+- Error o timeout del proveedor LLM: el turno continúa con el flujo determinista solo cuando se puede identificar el caso y no se ejecutaron herramientas previamente; de lo contrario finaliza con instrucciones de respaldo. La sesión se conserva y no se afirma que una acción fallida se completó.
 - Límite de iteraciones: el ciclo se detiene y resume los resultados ya obtenidos.
 - Error de aprobación: la simulación de envío no se ejecuta.
 
@@ -150,5 +150,6 @@ Los registros no contienen claves, credenciales ni números completos de cuentas
 - Una respuesta ambigua, rechazada o expirada no ejecuta `proveedor_simular_envio`.
 - El ciclo se detiene al alcanzar el límite de iteraciones.
 - Los errores del modelo y de herramientas no terminan la sesión con una excepción sin controlar.
+- La ausencia de clave y los errores de autenticación, límite/cuota, timeout o indisponibilidad producen `mode: "fallback"` sin exponer secretos; un caso explícito puede procesarse con herramientas deterministas y la confirmación humana sigue vigente.
 - El agente no presenta como completada una operación que falló.
 - No se ejecuta firma, envío real ni carga a portales.

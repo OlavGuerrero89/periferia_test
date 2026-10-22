@@ -29,7 +29,7 @@ Construir una aplicación independiente de registro de proveedores con chat, bac
 | REQ-08 | Calcular la vigencia de soportes frente a la fecha de ejecución. | Soporte vencido o exigido ausente impide `listo_para_firma`; un campo faltante por sí solo no impide ese estado. | HU-4, RN3 |
 | REQ-09 | Solicitar confirmación humana antes de una acción externa. | La confirmación debe ser explícita y provenir del mensaje inmediatamente anterior. En este reto, una confirmación válida solo crea `ENVIO-SIMULADO.md`; firma, carga a portal y envío real quedan fuera de alcance. | CA3, RN4 |
 | REQ-10 | Exponer las herramientas del agente como funciones tipadas e importables desde `demo.ts`. | Cada herramienta tiene `description`, argumentos Zod descritos y `execute(args, ctx)`; devuelve JSON `{ ok: true, data }` o `{ ok: false, error }` y no propaga excepciones. | 6.2, HU-5 |
-| REQ-11 | Ejecutar un ciclo de agente con tope configurable de iteraciones y manejo claro de fallos. | Al superar el tope, el agente responde con resultados y pendientes; errores del proveedor y de herramientas no matan la sesión. | 6.3, HU-5, 8 |
+| REQ-11 | Ejecutar un ciclo de agente con tope configurable de iteraciones y manejo claro de fallos. | Al superar el tope, el agente responde con resultados y pendientes; ante ausencia, rechazo, límite o indisponibilidad del proveedor, entrega un fallback determinista útil, conserva la sesión y no afirma que completó acciones que no ejecutó. | 6.3, HU-5, 8 |
 | REQ-12 | Mostrar en el chat historial, estado de espera, cada llamada a herramienta (nombre, argumentos y resumen del resultado) y solicitudes de confirmación. | Una persona puede revisar qué herramientas se ejecutaron y qué acción espera confirmación. | 6.1, CA3–CA5 |
 | REQ-13 | Exponer API para conversar, recuperar sesiones y comprobar salud. | `POST /api/chat`, `GET /api/sessions/:id` y `GET /api/health` documentados; la respuesta de salud identifica proveedor/modelo sin incluir secretos. | 6.4 |
 | REQ-14 | Registrar cada ejecución de herramienta. | Añadir en `out/<caso>/log.jsonl` `{ ts, herramienta, ok, resumen }`; los registros no contienen claves ni credenciales. | RN5, CA4 |
@@ -55,6 +55,7 @@ Construir una aplicación independiente de registro de proveedores con chat, bac
 - Los fixtures son de solo lectura; los artefactos generados se escriben en `out/`.
 - El prompt del sistema y el conocimiento reusable viven en `modulo/`; las herramientas compartidas se exponen desde `modulo/tools/proveedor.ts`.
 - El adaptador LLM implementa una interfaz propia para poder cambiar de proveedor sin reescribir el ciclo del agente.
+- Si el proveedor no está disponible, el chat usa el mismo flujo determinista de herramientas sin modelo cuando el mensaje identifica explícitamente un caso; si no, explica cómo continuar sin iniciar herramientas. Las acciones previas a un fallo se mantienen visibles, el envío simulado conserva la confirmación humana inmediata y `pnpm demo` sigue ejecutando todos los casos sin modelo.
 - El paquete prepara la revisión y firma humana. No firma ni envía a clientes.
 
 ## Verificaciones pendientes antes de implementar el flujo completo

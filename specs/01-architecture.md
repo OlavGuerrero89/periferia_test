@@ -87,6 +87,8 @@ Esto permite cambiar el SDK o proveedor sin modificar las reglas de dominio ni e
 
 Las pruebas automatizadas usan un adaptador falso y no requieren conexión a un proveedor.
 
+Si falta la clave o el proveedor rechaza/no puede atender la solicitud, la capa de aplicación registra el modo `fallback` y aplica reglas deterministas sin invocar otro modelo. Solo ante un mensaje con un ID de caso explícito puede ejecutar, en orden, las herramientas compartidas de lectura, mapeo, formulario y paquete. Presenta los resultados reales y mantiene la confirmación humana antes de crear `ENVIO-SIMULADO.md`; nunca llama esa herramienta automáticamente. Si no detecta el caso o ya se ejecutaron herramientas antes del fallo, evita repetir acciones y ofrece instrucciones. La demo local continúa disponible sin modelo.
+
 ## Sesiones
 
 El almacenamiento inicial de sesiones puede ser en memoria. Una sesión mantiene, como mínimo:

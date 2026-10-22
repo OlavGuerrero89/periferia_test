@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 
 type ToolCall = { name: string; arguments: unknown; ok: boolean; summary: string };
-type Message = { role: "user" | "assistant"; content: string; tools?: ToolCall[]; needsConfirmation?: boolean };
+type Message = { role: "user" | "assistant"; content: string; tools?: ToolCall[]; needsConfirmation?: boolean; mode?: "model" | "fallback" | "system" };
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: "Hola. Puedo leer una solicitud, mapear sus campos, generar el formulario y preparar un paquete para revisión. Dime, por ejemplo: ‘Procesa el caso co-industrias-delta’." }]);
@@ -26,10 +26,10 @@ export default function Home() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ message, ...(sessionId ? { sessionId } : {}) }),
       });
-      const data = await response.json() as { sessionId?: string; reply?: string; toolCalls?: ToolCall[]; needsConfirmation?: boolean; error?: { message?: string } };
+      const data = await response.json() as { sessionId?: string; reply?: string; toolCalls?: ToolCall[]; needsConfirmation?: boolean; mode?: Message["mode"]; error?: { message?: string } };
       if (data.sessionId) setSessionId(data.sessionId);
       if (!response.ok) throw new Error(data.reply ?? data.error?.message ?? "No se pudo procesar el mensaje.");
-      setMessages(previous => [...previous, { role: "assistant", content: data.reply ?? "", tools: data.toolCalls ?? [], needsConfirmation: data.needsConfirmation }]);
+      setMessages(previous => [...previous, { role: "assistant", content: data.reply ?? "", tools: data.toolCalls ?? [], needsConfirmation: data.needsConfirmation, mode: data.mode }]);
     } catch (cause) {
       const text = cause instanceof Error ? cause.message : "Error de conexión.";
       setError(text);
@@ -48,6 +48,7 @@ export default function Home() {
         {messages.map((message, index) => (
           <article key={`${message.role}-${index}`} style={{ marginBottom: 18, padding: 14, borderRadius: 10, background: message.role === "user" ? "#f0efff" : "#f7f8fb", borderLeft: message.needsConfirmation ? "4px solid #d97706" : undefined }}>
             <strong>{message.role === "user" ? "Tú" : "Agente"}</strong>
+            {message.mode === "fallback" && <strong style={{ color: "#8a4b08", marginLeft: 10 }}>Respaldo determinista</strong>}
             {message.needsConfirmation && <strong style={{ color: "#9a4d00", marginLeft: 10 }}>Confirmación pendiente</strong>}
             <p style={{ whiteSpace: "pre-wrap", lineHeight: 1.55, margin: "8px 0 0" }}>{message.content}</p>
             {message.tools?.map((tool, toolIndex) => (
