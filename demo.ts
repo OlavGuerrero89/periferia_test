@@ -6,7 +6,7 @@ import type { ToolContext } from "./src/domain/types";
 
 async function main(): Promise<void> {
   const projectRoot = process.cwd();
-  const fixtureRoot = process.env.DATA_DIR ?? "fixtures/demo/reto-01";
+  const fixtureRoot = process.env.DATA_DIR ?? "fixtures/reto-01";
   const sourceFixtures = path.resolve(projectRoot, fixtureRoot);
   const casesRoot = path.join(sourceFixtures, "casos");
   const caseIds = (await readdir(casesRoot, { withFileTypes: true })).filter(entry => entry.isDirectory()).map(entry => entry.name).sort();

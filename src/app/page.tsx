@@ -6,7 +6,7 @@ type ToolCall = { name: string; arguments: unknown; ok: boolean; summary: string
 type Message = { role: "user" | "assistant"; content: string; tools?: ToolCall[]; needsConfirmation?: boolean; mode?: "model" | "fallback" | "system" };
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: "Hola. Puedo leer una solicitud, mapear sus campos, generar el formulario y preparar un paquete para revisión. Dime, por ejemplo: ‘Procesa el caso co-industrias-delta’." }]);
+  const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: "Hola. Puedo leer una solicitud, mapear sus campos, generar el formulario y preparar un paquete para revisión. Prueba: ‘Procesa el caso ec-corp-andina. Dime qué campos quedaron llenos, cuáles faltan y qué soportes debo actualizar. No envíes nada todavía’." }]);
   const [input, setInput] = useState("");
   const [sessionId, setSessionId] = useState<string>();
   const [busy, setBusy] = useState(false);
@@ -64,7 +64,7 @@ export default function Home() {
       </section>
       <form onSubmit={submit} style={{ display: "flex", gap: 10, marginTop: 12 }}>
         <label htmlFor="message" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>Mensaje</label>
-        <input id="message" value={input} onChange={event => setInput(event.target.value)} placeholder="Ej.: prepara el paquete de co-industrias-delta" disabled={busy} style={{ flex: 1, padding: "13px 14px", border: "1px solid #b8c0d0", borderRadius: 8, fontSize: 15 }} />
+        <input id="message" value={input} onChange={event => setInput(event.target.value)} placeholder="Ej.: procesa el caso ec-corp-andina" disabled={busy} style={{ flex: 1, padding: "13px 14px", border: "1px solid #b8c0d0", borderRadius: 8, fontSize: 15 }} />
         <button type="submit" disabled={busy || !input.trim()} style={{ padding: "0 20px", border: 0, borderRadius: 8, background: busy ? "#9295a3" : "#5142bd", color: "white", fontWeight: 700, cursor: busy ? "wait" : "pointer" }}>{busy ? "Enviando…" : "Enviar"}</button>
       </form>
       <footer style={{ fontSize: 12, color: "#697386", marginTop: 10 }}>Sesiones en memoria: se pierden al reiniciar el proceso. No introduzcas secretos ni datos reales.</footer>

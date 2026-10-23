@@ -40,35 +40,35 @@ Las credenciales deberían provenir de un gestor de secretos con acceso de míni
 
 ## 6. Decisiones y trade-offs
 
-1. **Filesystem en vez de base de datos:** hace el ejercicio reproducible y simple de ejecutar; una base de datos sería necesaria para concurrencia, retención y recuperación de sesiones en producción.
-2. **Mapeo determinista antes que inferencia libre:** reduce errores y mantiene evidencia del origen; etiquetas nuevas quedan pendientes y exigen ampliar el glosario o revisión humana.
-3. **Archivos Excel/PDF generados desde sus contratos JSON:** los fixtures del reto describen ubicaciones y campos, pero no garantizan un binario de plantilla. Si se entrega `plantilla.xlsx`, se preserva y se escriben únicamente las celdas de valor; sin ese binario se crea una hoja con las ubicaciones descritas. El PDF se genera desde cero, como permite el reto.
-4. **Confirmación guardada en el servidor:** el modelo no puede autorizarse a sí mismo. Se restringe a una acción y un caso, y vence al llegar otro turno.
-5. **Demo con copia temporal:** permite probar las mismas herramientas sin modelo y evita borrar salidas de una persona o tocar fixtures originales.
+1. **Filesystem en vez de base de datos:** se eligió porque el PRD permite archivos locales y así la demo se levanta con menos componentes; una base de datos agregaría persistencia y concurrencia fuera del alcance.
+2. **Mapeo determinista en vez de inferencia libre:** se eligió para conservar la procedencia y evitar valores inventados; una etiqueta desconocida queda pendiente y exige ampliar el glosario o revisión humana.
+3. **Generar Excel desde el contrato JSON cuando no hay binario de plantilla:** se eligió porque los insumos entregan ubicaciones y nombres de hoja, pero no un archivo Excel original. Se crean las hojas declaradas y se escriben las celdas indicadas; si se agrega un `.xlsx`, se preserva y solo se escriben valores. El PDF se genera desde cero, como permite el reto.
+4. **Confirmación guardada en el servidor en vez de confiar en la respuesta del modelo:** el modelo no puede autorizarse a sí mismo. Se restringe a una acción y un caso, y vence al llegar otro turno.
+5. **Demo con copia temporal en vez de escribir en las salidas del proyecto:** permite probar las mismas herramientas sin modelo y evita modificar fixtures o salidas de una persona.
 
 ## 7. Supuestos
 
 - Los JSON de entrada siguen la estructura del PRD y los campos usan etiquetas o sinónimos documentados en el glosario.
 - La fecha de vigencia es una fecha calendario ISO; se compara en `America/Bogota`.
 - Los soportes son archivos locales incluidos en el índice. Si faltan, el paquete se bloquea para firma.
-- Los datos del maestro y los casos reales no deben publicarse. El repositorio incluye solamente un caso de demostración sintético.
+- Los identificadores de los cuatro casos corresponden a los fixtures del reto, que se declaran ficticios en el PRD. El maestro y todos los soportes incluidos en el repositorio son sintéticos y están rotulados o usan dominios reservados `.invalid`.
 - Las sesiones en memoria se pierden al reiniciar el servidor y esta versión no es multiusuario.
 
 ## 8. Cobertura
 
 | Historia | Estado | Evidencia / pendiente |
 |---|---|---|
-| HU-1 Leer solicitud | Hecho para contratos disponibles | Zod valida solicitud/plantilla; error controlado en fixtures inválidas. Falta ejecutar con fixtures originales. |
-| HU-2 Mapear campos | Hecho para glosario y maestro | Conserva fuente, faltantes y nota tributaria extranjera; requiere confirmar reglas adicionales de los casos reales. |
-| HU-3 Generar formulario | Hecho en demo sintética | Excel P0, PDF P1 y Markdown portal P2; verificar las celdas y campos de los originales. |
-| HU-4 Paquete | Hecho para el contrato de soportes | Incluye formulario, soportes presentes, checklist y borrador; validar con el índice real. |
-| HU-5 Errores | Hecho a nivel de herramienta/API | Errores normalizados y pruebas de rutas y confirmación; faltan pruebas con cada fixture real. |
-| API y chat | Parcial | API, interfaz y sesiones funcionan localmente; requiere clave del modelo para conversación real y despliegue público pendiente. |
+| HU-1 Leer solicitud | Hecho | Los cuatro casos del reto se procesan con solicitudes y plantillas sintéticas; casos inexistentes y contratos inválidos devuelven errores controlados. |
+| HU-2 Mapear campos | Hecho para el maestro sintético | Conserva fuente, faltantes y nota `identificador extranjero`; las pruebas verifican que no se inventen valores. |
+| HU-3 Generar formulario | Hecho para los formatos solicitados | Excel crea las hojas declaradas en JSON cuando no hay archivo binario; PDF produce un archivo válido y portal genera Markdown copiable. |
+| HU-4 Paquete | Hecho para los soportes sintéticos | Incluye formulario, soportes placeholder, checklist y borrador; las vigencias se comparan con la fecha de ejecución. |
+| HU-5 Errores | Hecho a nivel de herramienta/API | Errores normalizados y pruebas de rutas, fallos del proveedor y confirmación. |
+| API, chat y despliegue | Implementados | La URL pública usa los cuatro IDs del PRD. El flujo de herramientas está probado; la última prueba en vivo de OpenAI devolvió error de cuota y activó el fallback, por lo que la generación con modelo requiere cuota disponible. |
 | Bonus módulo reusable | Hecho | Prompt, skill y entrada de herramientas en `modulo/`; la aplicación carga e importa esas mismas piezas. |
 
 ## 9. Uso de IA
 
-Se usó ChatGPT/Codex para analizar el PRD y los specs, proponer la estructura, implementar código, generar pruebas y redactar esta documentación. El usuario debe revisar y comprender el código antes de la defensa, en especial mapeo, validación de rutas, manejo de datos bancarios, presupuesto del modelo y confirmación humana. No se usaron documentos reales ni secretos para generar el caso de demostración.
+Se usó ChatGPT/Codex para analizar el PRD y los specs, proponer la arquitectura y los contratos, implementar el código, generar y ejecutar pruebas, depurar el despliegue y redactar esta documentación. Se descartó automatizar el inicio de sesión o el envío a portales porque el PRD lo excluye y porque credenciales y MFA deben permanecer bajo control humano. También se descartó usar el modelo como fuente de valores: todos los campos proceden del maestro y los faltantes se reportan. Los casos, el maestro y los soportes versionados son sintéticos; no se subieron secretos. El usuario debe poder explicar el código, especialmente mapeo, rutas, datos bancarios, límites del modelo y confirmación humana.
 
 ## 10. Riesgos y mitigaciones de producción
 

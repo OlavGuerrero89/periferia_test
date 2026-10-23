@@ -9,6 +9,6 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: DATA_DIR
-        value: fixtures/demo/reto-01
+        value: fixtures/reto-01
       - key: OPENAI_API_KEY
         sync: false

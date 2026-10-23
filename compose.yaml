@@ -9,5 +9,5 @@ services:
     environment:
       - DATA_DIR=./fixtures/selected
     volumes:
-      - ${DATA_DIR_HOST:-./fixtures/demo/reto-01}:/app/fixtures/selected:ro
+      - ${DATA_DIR_HOST:-./fixtures/reto-01}:/app/fixtures/selected:ro
       - ./out:/app/out

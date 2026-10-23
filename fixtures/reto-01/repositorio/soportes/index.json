@@ -1,0 +1,10 @@
+{
+  "soportes": [
+    { "tipo": "camara_comercio", "archivo": "camara-comercio-sintetica.txt", "vigencia_hasta": "2030-12-31", "pais_emisor": "CO" },
+    { "tipo": "rut", "archivo": "rut-sintetico.txt", "vigencia_hasta": "2030-12-31", "pais_emisor": "CO" },
+    { "tipo": "certificacion_bancaria", "archivo": "certificacion-bancaria-sintetica.txt", "vigencia_hasta": "2030-12-31", "pais_emisor": "CO" },
+    { "tipo": "estados_financieros", "archivo": "estados-financieros-sinteticos.txt", "vigencia_hasta": "2030-12-31", "pais_emisor": "CO" },
+    { "tipo": "certificado_cumplimiento_tributario", "archivo": "certificado-tributario-sintetico.txt", "vigencia_hasta": "2030-12-31", "pais_emisor": "CO" },
+    { "tipo": "parafiscales", "archivo": "parafiscales-sinteticos.txt", "vigencia_hasta": "2030-12-31", "pais_emisor": "CO" }
+  ]
+}

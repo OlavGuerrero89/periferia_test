@@ -1,0 +1,44 @@
+{
+  "razon_social": "Periferia Datos Sintéticos S.A.S.",
+  "tipo_sociedad": "Sociedad por Acciones Simplificada",
+  "nit": "900000000-1",
+  "digito_verificacion": "1",
+  "direccion": "Calle Ficticia 123, oficina 501",
+  "ciudad": "Bogotá",
+  "departamento": "Cundinamarca",
+  "pais": "Colombia",
+  "codigo_postal": "110111",
+  "telefono": "+57 601 555 0101",
+  "sitio_web": "https://periferia.example.invalid",
+  "fecha_constitucion": "2015-04-15",
+  "matricula_mercantil": "SINT-000001",
+  "actividad_economica": "Desarrollo de software y consultoría tecnológica",
+  "ciiu_principal": "6201",
+  "regimen_tributario": "Régimen ordinario",
+  "numero_empleados": 42,
+  "ingresos_ultimo_ano": {
+    "valor": 1250000000,
+    "moneda": "COP"
+  },
+  "representante_legal": {
+    "nombre": "Persona de Prueba",
+    "identificacion": "1000000000",
+    "cargo": "Representante legal"
+  },
+  "contacto_comercial": {
+    "nombre": "Contacto Sintético",
+    "telefono": "+57 601 555 0102",
+    "email": "comercial@example.invalid"
+  },
+  "contacto_financiero": {
+    "nombre": "Finanzas Sintéticas",
+    "email": "finanzas@example.invalid"
+  },
+  "banco": {
+    "nombre": "Banco de Pruebas",
+    "tipo_cuenta": "Ahorros",
+    "numero_cuenta": "000000000000000000",
+    "titular": "Periferia Datos Sintéticos S.A.S.",
+    "swift": "SYNTHCO1"
+  }
+}

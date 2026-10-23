@@ -30,7 +30,8 @@ async function generateExcel(data: CaseData, ctx: ToolContext): Promise<Artefact
     sourceTemplateExists = true;
   } catch (error) {
     if (!(error && typeof error === "object" && "code" in error && error.code === "ENOENT")) throw new Error("La plantilla Excel original no se pudo leer o está corrupta.");
-    workbook.addWorksheet("Formulario");
+    const sheetNames = new Set(data.normalized.campos.map(field => field.hoja ?? "Formulario"));
+    for (const sheetName of sheetNames) workbook.addWorksheet(sheetName);
   }
   const resolutions = mapFields(data);
   for (const { campo, resolucion } of resolutions) {

@@ -8,7 +8,17 @@ outputs/
 /out/
 coverage/
 *.tsbuildinfo
-fixtures/reto-01/repositorio/
+/fixtures/reto-01/repositorio/**
+!/fixtures/reto-01/repositorio/
+!/fixtures/reto-01/repositorio/maestro.json
+!/fixtures/reto-01/repositorio/soportes/
+!/fixtures/reto-01/repositorio/soportes/index.json
+!/fixtures/reto-01/repositorio/soportes/camara-comercio-sintetica.txt
+!/fixtures/reto-01/repositorio/soportes/rut-sintetico.txt
+!/fixtures/reto-01/repositorio/soportes/certificacion-bancaria-sintetica.txt
+!/fixtures/reto-01/repositorio/soportes/estados-financieros-sinteticos.txt
+!/fixtures/reto-01/repositorio/soportes/certificado-tributario-sintetico.txt
+!/fixtures/reto-01/repositorio/soportes/parafiscales-sinteticos.txt
 inputs/
 
 /periferia-ai-ready.zip
