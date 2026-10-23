@@ -12,7 +12,7 @@ const roots: string[] = [];
 async function setupRoot(): Promise<string> {
   const root = await mkdtemp(path.join(os.tmpdir(), "periferia-fallback-"));
   roots.push(root);
-  await cp(path.join(process.cwd(), "fixtures/demo/reto-01"), path.join(root, "fixtures/demo/reto-01"), { recursive: true });
+  await cp(path.join(process.cwd(), "fixtures/tests/demo-reto-01"), path.join(root, "fixtures/tests/demo-reto-01"), { recursive: true });
   await cp(path.join(process.cwd(), "modulo"), path.join(root, "modulo"), { recursive: true });
   return root;
 }
@@ -33,7 +33,7 @@ class UnavailableAdapter implements LlmAdapter {
 describe("fallback determinista del agente", () => {
   it("procesa un caso explícito sin modelo y conserva la confirmación humana", async () => {
     const root = await setupRoot();
-    const app = new AgentApplication(new UnavailableAdapter("Falta OPENAI_API_KEY en el entorno del servidor."), root, undefined, "fixtures/demo/reto-01");
+    const app = new AgentApplication(new UnavailableAdapter("Falta OPENAI_API_KEY en el entorno del servidor."), root, undefined, "fixtures/tests/demo-reto-01");
 
     const result = await app.process("fallback-1", "Procesa el caso demo-sintetica");
 
@@ -58,7 +58,7 @@ describe("fallback determinista del agente", () => {
 
   it("da pasos concretos si el proveedor devuelve límite/cuota y mantiene viva la sesión", async () => {
     const root = await setupRoot();
-    const app = new AgentApplication(new UnavailableAdapter("El proveedor alcanzó su límite de solicitudes; intenta de nuevo en unos segundos."), root, undefined, "fixtures/demo/reto-01");
+    const app = new AgentApplication(new UnavailableAdapter("El proveedor alcanzó su límite de solicitudes; intenta de nuevo en unos segundos."), root, undefined, "fixtures/tests/demo-reto-01");
 
     const result = await app.process("fallback-2", "Procesa el caso demo-sintetica");
 
@@ -82,7 +82,7 @@ describe("fallback determinista del agente", () => {
 
   it("no interpreta una solicitud ambigua como caso ni inicia herramientas", async () => {
     const root = await setupRoot();
-    const app = new AgentApplication(new UnavailableAdapter("El proveedor de lenguaje no está disponible temporalmente."), root, undefined, "fixtures/demo/reto-01");
+    const app = new AgentApplication(new UnavailableAdapter("El proveedor de lenguaje no está disponible temporalmente."), root, undefined, "fixtures/tests/demo-reto-01");
     const result = await app.process("fallback-3", "Ayúdame con el registro de proveedor");
 
     expect(result.mode).toBe("fallback");

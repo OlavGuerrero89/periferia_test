@@ -15,7 +15,7 @@ const roots: string[] = [];
 async function setup(): Promise<ToolContext> {
   const root = await mkdtemp(path.join(os.tmpdir(), "periferia-test-"));
   roots.push(root);
-  const fixtureRoot = "fixtures/demo/reto-01";
+  const fixtureRoot = "fixtures/tests/demo-reto-01";
   await cp(path.join(process.cwd(), fixtureRoot), path.join(root, fixtureRoot), { recursive: true });
   return { projectRoot: root, fixtureRoot, sessionId: "test-session", now: new Date("2026-10-21T15:00:00.000Z") };
 }

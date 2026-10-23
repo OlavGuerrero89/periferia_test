@@ -107,7 +107,7 @@ docker compose up --build
 
 ### Despliegue de prueba en Render
 
-La demo pública está disponible en [https://periferia-test-demo.onrender.com](https://periferia-test-demo.onrender.com/). El servicio Docker de Render usa la rama `codex/fix-specs-ci`, monta `fixtures/reto-01` y comprueba su estado en `/api/health`. Prueba el caso `ec-corp-andina`, también usado como ejemplo en la sección 11 del PRD.
+La demo pública está disponible en [https://periferia-test-demo.onrender.com](https://periferia-test-demo.onrender.com/). El servicio Docker de Render usa la rama `codex/fix-specs-ci`, monta `fixtures/demo/reto-01` con los mismos cuatro IDs del reto y comprueba su estado en `/api/health`. Prueba el caso `ec-corp-andina`, también usado como ejemplo en la sección 11 del PRD.
 
 `OPENAI_API_KEY` es opcional para abrir la demo. Sin ella, o si OpenAI no puede responder, el chat entra en modo determinista: ante `Procesa el caso <id>` ejecuta las herramientas de lectura, mapeo, formulario y paquete sin modelo. Si no identifica el caso explícito, explica cómo continuar sin iniciar herramientas. Tras preparar un paquete, pide confirmación humana antes de crear `ENVIO-SIMULADO.md`. `/api/health` informa si la clave está configurada y anuncia que el respaldo está disponible; `configured: true` no garantiza cuota del proveedor. En la última prueba pública, OpenAI devolvió un error de cuota y el caso se completó con el respaldo determinista. Para probar el flujo generativo, la cuenta de API debe tener cuota disponible. Nunca escribas la clave en el YAML ni la subas a GitHub.
 

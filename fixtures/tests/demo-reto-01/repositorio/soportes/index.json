@@ -1,0 +1,6 @@
+{
+  "soportes": [
+    { "tipo": "Camara de comercio", "archivo": "camara-demo.txt", "vigencia_hasta": "2030-12-31", "pais_emisor": "CO" },
+    { "tipo": "RUT", "archivo": "rut-demo.txt", "vigencia_hasta": "2030-12-31", "pais_emisor": "CO" }
+  ]
+}

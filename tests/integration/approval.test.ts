@@ -11,7 +11,7 @@ const roots: string[] = [];
 async function setupRoot(): Promise<string> {
   const root = await mkdtemp(path.join(os.tmpdir(), "periferia-approval-"));
   roots.push(root);
-  await cp(path.join(process.cwd(), "fixtures/demo/reto-01"), path.join(root, "fixtures/demo/reto-01"), { recursive: true });
+  await cp(path.join(process.cwd(), "fixtures/tests/demo-reto-01"), path.join(root, "fixtures/tests/demo-reto-01"), { recursive: true });
   await cp(path.join(process.cwd(), "modulo"), path.join(root, "modulo"), { recursive: true });
   return root;
 }
@@ -36,7 +36,7 @@ describe("confirmación humana", () => {
   it("crea solo el envío simulado tras confirmación inmediata", async () => {
     const root = await setupRoot();
     const adapter = new PlannedAdapter();
-    const app = new AgentApplication(adapter, root, undefined, "fixtures/demo/reto-01");
+    const app = new AgentApplication(adapter, root, undefined, "fixtures/tests/demo-reto-01");
     const prepared = await app.process("s-1", "Prepara el paquete demo-sintetica");
     expect(prepared.needsConfirmation).toBe(true);
     expect(prepared.reply).toContain("Responde sí o no");
@@ -54,7 +54,7 @@ describe("confirmación humana", () => {
 
   it("expira si llega otro turno antes de la aprobación", async () => {
     const root = await setupRoot();
-    const app = new AgentApplication(new PlannedAdapter(), root, undefined, "fixtures/demo/reto-01");
+    const app = new AgentApplication(new PlannedAdapter(), root, undefined, "fixtures/tests/demo-reto-01");
     await app.process("s-2", "Prepara el paquete demo-sintetica");
     await app.process("s-2", "Muéstrame los pendientes");
     const late = await app.process("s-2", "Sí");
@@ -65,7 +65,7 @@ describe("confirmación humana", () => {
 
   it("registra el rechazo y no crea el archivo simulado", async () => {
     const root = await setupRoot();
-    const app = new AgentApplication(new PlannedAdapter(), root, undefined, "fixtures/demo/reto-01");
+    const app = new AgentApplication(new PlannedAdapter(), root, undefined, "fixtures/tests/demo-reto-01");
     await app.process("s-3", "Prepara el paquete demo-sintetica");
     const rejected = await app.process("s-3", "No, cancela");
     expect(rejected.needsConfirmation).toBe(false);
