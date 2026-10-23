@@ -10,7 +10,7 @@ Aplicación independiente para leer solicitudes de registro, mapear campos con f
 - Checklist de soportes, borrador de correo, auditoría JSONL y confirmación inmediata para crear el envío simulado local.
 - Incluye los cuatro casos del reto (`co-industrias-delta`, `ec-corp-andina`, `hn-agroexport-sula` y `pa-logistica-istmo`) con un maestro y soportes enteramente sintéticos. No contiene documentos ni datos bancarios reales.
 - Incluye el módulo reusable en `modulo/`: prompt, skill del proceso y herramientas importables sin iniciar el servidor Next.js.
-- Los fixtures originales del reto aún deben copiarse a `fixtures/reto-01/` para validar los casos de entrega.
+- La demo pública y `pnpm demo` usan directamente estos mismos cuatro IDs de caso, con valores y soportes sintéticos.
 
 ## Requisitos
 
